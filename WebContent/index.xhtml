@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<title>Carrinho de Compras!</title>
+	<style>
+		body { font-size: 12px; }
+	</style>
+</h:head>
+<h:body>
+	<h:form prependId="false">
+		<p:layout >
+			<p:layoutUnit position="center" style="min-height: 500px; border: 0;">
+				<p:carousel value="#{carrinhoController.produtos}" headerText="Catálogo" var="prod" itemStyle="height:200px; width: 400px;"
+					numVisible="1" itemStyleClass="produto" style="margin: auto; display: block;" id="carroselProdutos" >
+					<h:panelGrid style="width: 90%; position: relative;" cellpadding="5">
+						<f:facet name="header">
+							<p:graphicImage library="images" name="#{prod.imagem}" 	style="max-height: 100px; margin: auto; display: block;" />
+						</f:facet>
+	
+						<h:outputText id="produto_nome" value="#{prod.nome}" style="font-weight:  bold" />
+						<h:panelGroup>
+							<h:outputText value="Preço: " />
+							<h:outputText value="R$ #{prod.preco}" style="font-weight:  bold" />
+						</h:panelGroup>
+	
+						<h:panelGroup>
+							<h:outputText value="Quantidade: " />
+							<p:spinner id="produto_quantidade"  value="#{carrinhoController.quantidade}" min="1" size="3" />
+						</h:panelGroup>
+						
+						<p:commandButton value="Adiconar" process="produto_quantidade @this" update="@([id$=carrinho_items]) produto_quantidade" 
+										 action="#{carrinhoController.adicionarProduto}" id="produto_adicionar"
+										 style="margin: auto; display: block; position: absolute; top: 150px; right: 0px;">
+							<f:setPropertyActionListener value="#{prod}" target="#{carrinhoController.produtoSelecionado}" />
+						</p:commandButton>
+					</h:panelGrid>
+									
+	
+				</p:carousel>
+				
+				<p:dataTable id="carrinho_items" var="item" value="#{carrinhoController.itemsNoCarrinho}" style="margin-top: 50px;" 
+					emptyMessage="Nenhum produto adicionado até o momento.">
+					<f:facet name="footer">
+						<h:outputText value="#{carrinhoController.itemsNoCarrinho.size()} produtos(s)."  />
+						<h:outputText id="carrinho_total" value="Total: R$ #{carrinhoController.total}	" style="margin-left: 700px; "/>					        
+					</f:facet>					
+					<p:column headerText="Produto">
+					    <h:outputText id="carrinho_produto_nome" value="#{item.produto.nome}" />
+					</p:column>
+					
+					<p:column headerText="Quantidade">
+					    <h:outputText id="carrinho_produto_quantidade" value="#{item.quantidade}" />
+					</p:column>
+					
+					<p:column headerText="Preço">
+					    <h:outputText value="R$ #{item.produto.preco}" />
+					</p:column>
+					
+					<p:column headerText="Subtotal">
+					    <h:outputText value="R$ #{item.produto.preco * item.quantidade}" />
+					</p:column>
+					
+					<p:column headerText="Ações" width="10%">
+						<p:commandButton icon="ui-icon-trash" process="@this" update="carrinho_items" action="#{carrinhoController.removerProduto}" style="margin: auto; display: block;">
+							<f:setPropertyActionListener value="#{item.produto}" target="#{carrinhoController.produtoSelecionado}" />
+						</p:commandButton>
+					</p:column>
+				</p:dataTable>			
+			</p:layoutUnit>
+		</p:layout>
+		 
+		<p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+		    <p:graphicImage library="images" name="ajaxloadingbar.gif" />
+		</p:dialog>
+		<p:ajaxStatus onstart="statusDialog.show()" oncomplete="statusDialog.hide();" />
+
+	</h:form>
+
+</h:body>
+</html>
